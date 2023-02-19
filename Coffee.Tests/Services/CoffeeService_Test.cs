@@ -101,5 +101,28 @@ namespace Coffee.Tests.Services
             Assert.That(result?.Message, Is.EqualTo(_config.GetSection(_icedCoffeeConfigKey).Value));
         }
 
+
+
+        [Test]
+        public void GetCoffee_WhenWeatherServiceUnavailable_ReturnsFailureResult()
+        {
+            _weatherReadDTO.main.temp = _31CelsiusInKelvins;
+
+            _weatherServiceResult.Setup(sr => sr.Data).Returns(_weatherReadDTO);
+            _weatherServiceResult.Setup(sr => sr.Status).Returns(false);
+            _weatherServiceResult.Setup(sr => sr.Message).Returns("");
+            _httpWeatherService.Setup(ws => ws.GetWeather(_city))
+                .Returns(Task.FromResult(_weatherServiceResult.Object));
+
+
+            var coffeeService = new CoffeeService(_config, _resultFact, _httpWeatherService.Object);
+
+            var result = coffeeService.GetCoffee().Result;
+
+
+            Assert.That(result?.Status, Is.False);
+            Assert.That(result?.Message, Does.StartWith("Weather request was not processed !").IgnoreCase);
+        }
+
     }
 }

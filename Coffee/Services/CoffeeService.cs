@@ -34,7 +34,7 @@ namespace Coffee.Services
             var weatherResult = await _httpWeatherService.GetWeather(_city);
 
             if (weatherResult == null || !weatherResult.Status)
-                return _resultFact.Result("", false, Environment.NewLine + $"Weather request was not processed ! Reason: '{weatherResult?.Message ?? "N/A"}'");
+                return _resultFact.Result("", false, $"Weather request was not processed ! Reason: '{weatherResult?.Message ?? "N/A"}'");
 
             var result = _resultFact.Result(JsonConvert.SerializeObject(new CoffeeReadDTO { Message = weatherResult.Data?.main.temp <= _ctt ? _messageHotCoffee : _messageIcedCoffee }), true, "");
 
